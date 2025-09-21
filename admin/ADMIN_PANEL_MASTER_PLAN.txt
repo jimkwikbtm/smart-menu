@@ -1,0 +1,810 @@
+================================================================================
+                         LUNA DINE ADMIN PANEL - MASTER PLAN
+================================================================================
+
+PROJECT OVERVIEW:
+-----------------
+Author: Murtuza Hasan )Moon Tech BD)
+Client: Restaurant Owners in Bangladesh
+Project: Luna Dine - Smart QR Menu System for Multi-Branch Restaurants in Bangladesh
+Target: Low-end server deployment with minimal costs
+UI/UX: Premium modern mobile-first design with desktop compatibility
+Tech Stack: PHP, Vanilla JavaScript, HTML5, CSS3, JSON, SQLite
+Notifications: Firebase Web Push Notifications
+Analytics: Google Charts
+QR Generation: https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=Example
+
+================================================================================
+                            ROLE-BASED ACCESS CONTROL
+================================================================================
+
+ROLE HIERARCHY (Based on Current Database Schema):
+1. ADMIN (Level 100) - Full system access for developers
+2. RESTAURANT_OWNER (Level 90) - Multi-branch management
+3. MANAGER (Level 80) - Branch operations management
+4. BRANCH_MANAGER (Level 70) - Day-to-day branch operations
+5. CHEF (Level 60) - Kitchen operations
+6. WAITER (Level 50) - Floor service management
+7. DELIVERY_RIDER (Level 40) - Delivery operations
+8. RESTAURANT_STAFF (Level 30) - Basic operations
+
+================================================================================
+                              DIRECTORY STRUCTURE
+================================================================================
+
+/admin/
+├── index.php                          # Main login/dashboard entry point
+├── config/
+│   ├── admin_config.php                # Admin-specific configurations
+│   ├── firebase_config.js              # Firebase setup for notifications
+│   └── session_manager.php             # Session handling & security
+├── assets/
+│   ├── css/
+│   │   ├── admin-core.css              # Core admin styling
+│   │   ├── components.css              # Reusable UI components
+│   │   ├── mobile-first.css            # Mobile-first responsive design
+│   │   ├── themes/
+│   │   │   ├── light.css               # Light theme
+│   │   │   ├── dark.css                # Dark theme
+│   │   │   └── high-contrast.css       # Accessibility theme
+│   │   └── print.css                   # Print styles for reports
+│   ├── js/
+│   │   ├── admin-core.js               # Core admin functionality
+│   │   ├── components/
+│   │   │   ├── notifications.js        # Firebase notification handler
+│   │   │   ├── charts.js               # Google Charts integration
+│   │   │   ├── data-tables.js          # Advanced table management
+│   │   │   ├── qr-generator.js         # QR code generation
+│   │   │   ├── image-upload.js         # Image handling
+│   │   │   ├── modal-manager.js        # Modal dialogs
+│   │   │   ├── form-validator.js       # Form validation
+│   │   │   └── real-time-updates.js    # Live data updates
+│   │   ├── modules/
+│   │   │   ├── dashboard.js            # Dashboard-specific JS
+│   │   │   ├── orders.js               # Order management
+│   │   │   ├── menu.js                 # Menu management
+│   │   │   ├── users.js                # User management
+│   │   │   ├── branches.js             # Branch management
+│   │   │   ├── reports.js              # Reporting functionality
+│   │   │   └── settings.js             # Settings management
+│   │   └── utils/
+│   │       ├── api-client.js           # API communication
+│   │       ├── helpers.js              # Utility functions
+│   │       └── validation.js           # Validation utilities
+│   ├── images/
+│   │   ├── icons/                      # Admin panel icons
+│   │   ├── logos/                      # Brand logos
+│   │   ├── placeholders/               # Default images
+│   │   └── avatars/                    # User avatars
+│   └── fonts/                          # Custom fonts if needed
+├── api/
+│   ├── auth.php                        # Authentication endpoints
+│   ├── dashboard.php                   # Dashboard data endpoints
+│   ├── users.php                       # User management API
+│   ├── roles.php                       # Role management API
+│   ├── branches.php                    # Branch management API
+│   ├── menu.php                        # Menu management API
+│   ├── orders.php                      # Order management API
+│   ├── tables.php                      # Table management API
+│   ├── promotions.php                  # Promotion management API
+│   ├── feedback.php                    # Feedback management API
+│   ├── reports.php                     # Report generation API
+│   ├── notifications.php               # Notification management API
+│   ├── settings.php                    # Settings management API
+│   └── uploads.php                     # File upload handling
+├── pages/
+│   ├── login.php                       # Login page
+│   ├── dashboard.php                   # Main dashboard
+│   ├── users/
+│   │   ├── list.php                    # User listing
+│   │   ├── create.php                  # Create user
+│   │   ├── edit.php                    # Edit user
+│   │   └── profile.php                 # User profile
+│   ├── branches/
+│   │   ├── list.php                    # Branch listing
+│   │   ├── create.php                  # Create branch
+│   │   ├── edit.php                    # Edit branch
+│   │   └── settings.php                # Branch settings
+│   ├── menu/
+│   │   ├── categories.php              # Category management
+│   │   ├── items.php                   # Item management
+│   │   ├── pricing.php                 # Branch-specific pricing
+│   │   └── availability.php            # Item availability
+│   ├── orders/
+│   │   ├── live.php                    # Live order monitoring
+│   │   ├── history.php                 # Order history
+│   │   ├── kitchen.php                 # Kitchen display
+│   │   └── delivery.php                # Delivery tracking
+│   ├── tables/
+│   │   ├── management.php              # Table management
+│   │   ├── qr-codes.php                # QR code generation
+│   │   └── service.php                 # Table service status
+│   ├── promotions/
+│   │   ├── list.php                    # Promotion listing
+│   │   ├── create.php                  # Create promotion
+│   │   └── analytics.php               # Promotion analytics
+│   ├── feedback/
+│   │   ├── reviews.php                 # Customer reviews
+│   │   ├── ratings.php                 # Rating analytics
+│   │   └── responses.php               # Response management
+│   ├── reports/
+│   │   ├── sales.php                   # Sales reports
+│   │   ├── menu.php                    # Menu performance
+│   │   ├── staff.php                   # Staff performance
+│   │   └── custom.php                  # Custom reports
+│   ├── notifications/
+│   │   ├── templates.php               # Notification templates
+│   │   ├── send.php                    # Send notifications
+│   │   └── history.php                 # Notification history
+│   └── settings/
+│       ├── general.php                 # General settings
+│       ├── features.php                # Feature flags
+│       ├── security.php                # Security settings
+│       └── integrations.php            # Third-party integrations
+├── components/
+│   ├── header.php                      # Admin header component
+│   ├── sidebar.php                     # Navigation sidebar
+│   ├── footer.php                      # Admin footer
+│   ├── breadcrumb.php                  # Breadcrumb navigation
+│   ├── modals/
+│   │   ├── confirm.php                 # Confirmation modal
+│   │   ├── alert.php                   # Alert modal
+│   │   └── form.php                    # Form modal
+│   └── widgets/
+│       ├── stat-card.php               # Statistics card
+│       ├── chart-container.php         # Chart wrapper
+│       ├── data-table.php              # Data table component
+│       └── notification-toast.php      # Toast notifications
+├── includes/
+│   ├── auth_check.php                  # Authentication verification
+│   ├── permission_check.php            # Permission verification
+│   ├── security.php                    # Security functions
+│   ├── helpers.php                     # Helper functions
+│   └── constants.php                   # Admin constants
+├── uploads/                            # File upload directory
+│   ├── avatars/                        # User avatars
+│   ├── menu-images/                    # Menu item images
+│   ├── banners/                        # Promotional banners
+│   └── temp/                           # Temporary uploads
+└── logs/                               # Admin activity logs
+    ├── access.log                      # Access logs
+    ├── errors.log                      # Error logs
+    └── security.log                    # Security events
+
+================================================================================
+                            CORE FEATURES BY ROLE
+================================================================================
+
+ADMIN (Full Developer Access):
+- System Configuration & Feature Toggles
+- User & Role Management (All Levels)
+- Database Management & Maintenance
+- Security Settings & Monitoring
+- System Logs & Error Tracking
+- API Rate Limiting & Performance
+- Backup & Restore Operations
+- Advanced Analytics & Reports
+- Integration Management
+- White-label Customization
+
+RESTAURANT_OWNER:
+- Multi-Branch Dashboard Overview
+- Branch Creation & Management
+- Staff Management (All Roles)
+- Financial Reports & Analytics
+- Menu Management (Global)
+- Promotion Management
+- Customer Feedback Overview
+- Performance Analytics
+- Revenue Tracking
+- Brand Settings
+
+MANAGER:
+- Multi-Branch Dashboard Overview
+- Branch Creation & Management
+- Staff Management (All Roles axcept admin and owner)
+- Financial Reports & Analytics
+- Menu Management (Global)
+- Promotion Management
+- Customer Feedback Overview
+- Performance Analytics
+- Revenue Tracking
+- Brand Settings
+
+BRANCH_MANAGER:
+- Daily Operations Dashboard
+- Order Processing
+- Table Service Coordination
+- Staff Scheduling
+- Customer Service
+- Basic Reports
+- Feedback Management
+- Service Request Handling
+
+CHEF:
+- Kitchen Dashboard
+- Order Queue Management
+- Menu Item Status
+- Preparation Time Tracking
+- Kitchen Notifications
+- Recipe Management
+- Inventory Alerts
+
+WAITER:
+- Floor Management Dashboard
+- Table Status Monitoring
+- Order Taking & Updates
+- Service Request Handling
+- Customer Communication
+- Table Assignments
+- Tips Tracking
+
+DELIVERY_RIDER:
+- Delivery Dashboard
+- Order Assignment
+- Route Optimization
+- Delivery Status Updates
+- Customer Location
+- Delivery History
+- Earnings Tracking
+
+RESTAURANT_STAFF:
+- Basic Dashboard
+- Assigned Tasks
+- Order Status Viewing
+- Customer Assistance
+- Basic Notifications
+
+================================================================================
+                                UI/UX DESIGN SYSTEM
+================================================================================
+
+DESIGN PRINCIPLES:
+- Mobile-First Responsive Design
+- Progressive Web App Ready
+- Accessibility Compliant (WCAG 2.1 AA)
+- High Performance on Low-End Devices
+- Offline Capability
+- Touch-Friendly Interface
+- Dark/Light Mode Support
+
+COLOR PALETTE:
+Primary: #06C167 (Luna Green)
+Secondary: #FFC300 (Golden Yellow)
+Accent: #0074E4 (Professional Blue)
+Error: #FF4136 (Alert Red)
+Warning: #FF851B (Warning Orange)
+Success: #2ECC40 (Success Green)
+Gray Scale: #F8F9FA to #212529
+
+TYPOGRAPHY:
+- Primary: System fonts (San Francisco, Segoe UI, Roboto)
+- Fallback: Arial, sans-serif
+- Scale: 12px, 14px, 16px, 18px, 24px, 32px, 48px
+- Line Height: 1.5 (body), 1.2 (headings)
+
+COMPONENT LIBRARY:
+- Navigation (Top bar + Collapsible sidebar)
+- Cards (Info, Stats, Actions)
+- Forms (Input, Select, Checkbox, Radio)
+- Buttons (Primary, Secondary, Outline, Icon)
+- Tables (Sortable, Filterable, Paginated)
+- Modals (Confirmation, Forms, Information)
+- Alerts (Success, Error, Warning, Info)
+- Charts (Line, Bar, Pie, Donut)
+- Notifications (Toast, Push, In-app)
+- Loading States (Skeleton, Spinner, Progress)
+
+LAYOUT PATTERNS:
+- Dashboard Grid (Responsive cards)
+- List View (Table + Filters)
+- Detail View (Master-detail pattern)
+- Form Layout (Step-by-step wizards)
+- Modal Overlay (Contextual actions)
+
+================================================================================
+                            TECHNICAL SPECIFICATIONS
+================================================================================
+
+FRONTEND TECHNOLOGIES:
+- HTML5 (Semantic markup)
+- CSS3 (Grid, Flexbox, Custom Properties)
+- Vanilla JavaScript (ES6+)
+- Service Workers (PWA features)
+- Web App Manifest
+- Local Storage/IndexedDB
+
+BACKEND TECHNOLOGIES:
+- PHP 7.4+ (Session-based authentication)
+- SQLite Database (Existing schema)
+- RESTful API Design
+- JSON Data Exchange
+- File Upload Handling
+- Email Integration (PHPMailer)
+
+SECURITY FEATURES:
+- CSRF Protection
+- XSS Prevention
+- SQL Injection Protection
+- Session Security
+- Input Validation
+- Output Sanitization
+- Rate Limiting
+- Security Headers
+- Password Hashing (bcrypt)
+- Account Lockout
+
+PERFORMANCE OPTIMIZATIONS:
+- Code Minification
+- Image Optimization
+- Lazy Loading
+- Caching Strategies
+- Database Query Optimization
+- CDN Integration
+- Gzip Compression
+- Resource Bundling
+
+NOTIFICATION SYSTEM:
+- Firebase Cloud Messaging (FCM)
+- Real-time Browser Notifications
+- Email Notifications
+- SMS Integration (Future)
+- In-app Notification Center
+- Template-based Messaging
+- Scheduled Notifications
+- Multi-channel Delivery
+
+================================================================================
+                              FEATURE MODULES
+================================================================================
+
+1. AUTHENTICATION & AUTHORIZATION
+Features:
+- Secure login with session management
+- Role-based access control
+- Password reset functionality
+- Account lockout protection
+- Login activity logging
+- Multi-device session management
+- Remember me functionality
+- Two-factor authentication (Future)
+
+Technical Implementation:
+- PHP session management
+- Password hashing with bcrypt
+- CSRF token validation
+- Rate limiting for login attempts
+- Secure cookie handling
+- Session timeout management
+
+2. DASHBOARD & ANALYTICS
+Features:
+- Role-specific dashboard layouts
+- Real-time data updates
+- Key performance indicators (KPIs)
+- Interactive charts and graphs
+- Quick action shortcuts
+- Recent activity feeds
+- System notifications
+- Weather widget (for delivery)
+
+Technical Implementation:
+- Google Charts integration
+- firebase web push real-time updates
+- AJAX data fetching
+- Responsive grid layouts
+- Chart data caching
+- Performance monitoring
+
+3. USER MANAGEMENT
+Features:
+- User CRUD operations
+- Role assignment and management
+- Branch assignments
+- User activity tracking
+- Profile management
+- Avatar uploads
+- Contact information
+- Account status management
+
+Technical Implementation:
+- User registration workflow
+- Profile image handling
+- Permission inheritance
+- Activity logging
+- Email verification
+- Bulk user operations
+
+4. BRANCH MANAGEMENT
+Features:
+- Branch CRUD operations
+- Location mapping
+- Operating hours configuration
+- Contact information
+- Manager assignments
+- Branch-specific settings
+- Performance metrics
+- Service area mapping
+
+Technical Implementation:
+- Google Maps integration
+- Timezone handling
+- Geographic calculations
+- Branch-specific data filtering
+- Image gallery management
+- Settings inheritance
+
+5. MENU MANAGEMENT
+Features:
+- Category management
+- Item CRUD operations
+- Multi-language support
+- Image gallery
+- Nutritional information
+- Allergen tracking
+- Pricing by branch
+- Availability scheduling
+
+Technical Implementation:
+- Translation key system
+- Image upload and resizing
+- JSON data structures
+- Batch operations
+- Price history tracking
+- Availability algorithms
+
+6. ORDER MANAGEMENT
+Features:
+- Live order monitoring
+- Order status updates
+- Kitchen display system
+- Delivery tracking
+- Payment processing
+- Order analytics
+- Customer communication
+- Refund management
+
+Technical Implementation:
+- Real-time order updates
+- Status workflow management
+- Integration with payment gateways
+- GPS tracking for delivery
+- Notification triggering
+- Order aggregation
+
+7. TABLE MANAGEMENT
+Features:
+- Table layout visualization
+- QR code generation
+- Table status monitoring
+- Reservation system
+- Service request handling
+- Capacity management
+- Cleaning schedules
+- Wait time tracking
+
+Technical Implementation:
+- QR code API integration
+- Visual table maps
+- Real-time status updates
+- SVG-based layouts
+- Touch-friendly interface
+- Status color coding
+
+8. PROMOTION MANAGEMENT
+Features:
+- Promotion CRUD operations
+- Discount calculations
+- Usage tracking
+- Automated promotions
+- A/B testing
+- Performance analytics
+- Customer targeting
+- Expiration management
+
+Technical Implementation:
+- Discount calculation engine
+- Usage quota tracking
+- Date/time validation
+- Customer segmentation
+- Performance metrics
+- Automated notifications
+
+9. FEEDBACK MANAGEMENT
+Features:
+- Review collection
+- Rating analytics
+- Response management
+- Sentiment analysis
+- Feedback categorization
+- Performance tracking
+- Alert systems
+- Public review display
+
+Technical Implementation:
+- Rating aggregation
+- Text analysis algorithms
+- Response templates
+- Notification triggers
+- Data visualization
+- Export capabilities
+
+10. REPORTING & ANALYTICS
+Features:
+- Sales reports
+- Menu performance
+- Staff productivity
+- Customer analytics
+- Financial summaries
+- Custom report builder
+- Scheduled reports
+- Data export options
+
+Technical Implementation:
+- Report generation engine
+- Data aggregation queries
+- Chart rendering
+- PDF generation
+- Email scheduling
+- Data caching
+
+11. NOTIFICATION SYSTEM
+Features:
+- Push notifications
+- Email notifications
+- SMS integration
+- In-app messaging
+- Template management
+- Scheduled notifications
+- Targeted messaging
+- Delivery tracking
+
+Technical Implementation:
+- Firebase Cloud Messaging
+- Email service integration
+- Template engine
+- Queue management
+- Delivery confirmation
+
+12. SETTINGS & CONFIGURATION
+Features:
+- System settings
+- Feature toggles
+- Integration management
+- Security settings
+- Backup/restore
+- Theme customization
+- Language settings
+- Performance tuning
+
+Technical Implementation:
+- Configuration management
+- Feature flag system
+- Database backup/restore
+- Theme switching
+- Localization support
+- Performance monitoring
+
+================================================================================
+                            DATABASE INTEGRATION
+================================================================================
+
+EXISTING TABLES UTILIZATION:
+- Users: Authentication and user management
+- Roles: Permission-based access control
+- Branches: Multi-location management
+- MenuCategories: Category organization
+- MenuItems_Global: Global menu items
+- BranchMenu: Branch-specific pricing/availability
+- Orders: Order processing and tracking
+- OrderItems: Order detail management
+- Tables: Table and QR code management
+- Promotions: Discount and promotion system
+- Feedback: Customer review system
+- Notifications: System messaging
+- Settings: Configuration management
+- AdminLogs: Activity tracking
+- AdminSessions: Session management
+
+ADDITIONAL TABLES NEEDED:
+- AdminThemes: Theme preferences
+- AdminWidgets: Dashboard customization
+- ReportTemplates: Custom report definitions
+- NotificationQueues: Notification processing
+- FileUploads: File management
+- AuditTrail: Enhanced logging
+- SystemHealth: Performance monitoring
+
+================================================================================
+                              DEVELOPMENT PHASES
+================================================================================
+
+PHASE 1: FOUNDATION (Week 1-2)
+- Set up project structure
+- Implement authentication system
+- Create basic dashboard layout
+- Develop core components
+- Set up session management
+- Implement security measures
+
+PHASE 2: CORE FEATURES (Week 3-4)
+- User management interface
+- Branch management system
+- Basic menu management
+- Order monitoring dashboard
+- Table management basics
+- Notification framework
+
+PHASE 3: ADVANCED FEATURES (Week 5-6)
+- Advanced analytics dashboard
+- Reporting system
+- Promotion management
+- Feedback system
+- Advanced user permissions
+- File upload system
+
+PHASE 4: INTEGRATIONS (Week 7-8)
+- Firebase notifications
+- Google Charts integration
+- QR code generation
+- Email notifications
+- Performance optimization
+- Mobile responsiveness
+
+PHASE 5: TESTING & REFINEMENT (Week 9-10)
+- Security testing
+- Performance testing
+- User acceptance testing
+- Bug fixes and optimization
+- Documentation completion
+- Deployment preparation
+
+================================================================================
+                             SECURITY CONSIDERATIONS
+================================================================================
+
+DATA PROTECTION:
+- Input validation and sanitization
+- Output encoding
+- SQL injection prevention
+- XSS protection
+- CSRF token implementation
+- Secure file uploads
+- Password strength requirements
+- Data encryption for sensitive information
+
+ACCESS CONTROL:
+- Role-based permissions
+- Session management
+- Account lockout policies
+- Password policies
+- Activity logging
+- IP-based restrictions (optional)
+- Time-based access controls
+- Multi-level authorization
+
+SYSTEM SECURITY:
+- Secure headers implementation
+- HTTPS enforcement
+- File permission controls
+- Directory traversal prevention
+- Error message sanitization
+- Security monitoring
+- Regular security updates
+- Backup encryption
+
+================================================================================
+                            PERFORMANCE OPTIMIZATION
+================================================================================
+
+FRONTEND OPTIMIZATION:
+- Minimize HTTP requests
+- Image optimization and lazy loading
+- CSS and JavaScript minification
+- Caching strategies
+- Service worker implementation
+- Progressive loading
+- Touch optimization
+- Offline functionality
+
+BACKEND OPTIMIZATION:
+- Database query optimization
+- Connection pooling
+- Caching mechanisms
+- File compression
+- Response optimization
+- Resource management
+- Memory usage optimization
+- Error handling efficiency
+
+LOW-END SERVER CONSIDERATIONS:
+- Minimal resource usage
+- Efficient algorithms
+- Database optimization
+- Reduced memory footprint
+- Optimized file structures
+- Minimal dependencies
+- Efficient caching
+- Resource monitoring
+
+================================================================================
+                               DEPLOYMENT STRATEGY
+================================================================================
+
+DEVELOPMENT ENVIRONMENT:
+- Local XAMPP setup
+- Version control with Git
+- Code formatting standards
+- Documentation requirements
+- Testing protocols
+- Quality assurance
+
+PRODUCTION DEPLOYMENT:
+- Low-cost hosting optimization
+- Database migration scripts
+- Configuration management
+- Backup strategies
+- Monitoring setup
+- Error logging
+- Performance tracking
+- Security hardening
+
+MAINTENANCE PLAN:
+- Regular updates
+- Security patches
+- Performance monitoring
+- Backup verification
+- User feedback integration
+- Feature enhancement
+- Documentation updates
+- Training materials
+
+================================================================================
+                                SUCCESS METRICS
+================================================================================
+
+TECHNICAL METRICS:
+- Page load time < 3 seconds
+- Mobile responsiveness score > 95%
+- Accessibility compliance (WCAG 2.1 AA)
+- Security score > 90%
+- Uptime > 99.5%
+- Database query efficiency
+- Memory usage optimization
+- Error rate < 1%
+
+USER EXPERIENCE METRICS:
+- User satisfaction > 4.5/5
+- Task completion rate > 95%
+- Feature adoption rate
+- User retention rate
+- Support ticket reduction
+- Training time reduction
+- Mobile usage analytics
+- Performance feedback
+
+BUSINESS METRICS:
+- Operational efficiency improvement
+- Cost reduction from automation
+- Order processing speed increase
+- Customer satisfaction improvement
+- Staff productivity increase
+- Revenue tracking accuracy
+- Inventory management efficiency
+- Customer engagement metrics
+
+
+
+================================================================================
+                                   CONCLUSION
+================================================================================
+
+This comprehensive plan provides a roadmap for developing a world-class admin panel for Luna Dine that meets the specific requirements of Moon Tech BD while ensuring optimal performance on low-end servers. The mobile-first design approach, combined with robust security measures and advanced features, will provide an exceptional user experience for restaurant management across all roles and responsibilities.
+
+The phased development approach ensures steady progress while maintaining quality standards. The focus on performance optimization and cost-effective deployment strategies aligns with the goal of minimizing server costs while maximizing functionality.
+
+This admin panel will serve as a competitive advantage for Luna Dine in the Bangladesh market, providing restaurant owners with professional-grade management tools typically found in expensive enterprise solutions, but optimized for local market conditions and budget constraints.
+
+================================================================================
+                                  END OF PLAN
+================================================================================

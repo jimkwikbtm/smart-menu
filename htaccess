@@ -1,0 +1,13 @@
+# .htaccess
+
+# Enable the rewrite engine.
+RewriteEngine On
+RewriteBase /
+
+# -- Redirection and Rewrite Rules --
+
+# Redirect requests for the api to the index.php file in the api directory.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^api/(.*)$ api/index.php [QSA,L]
+
