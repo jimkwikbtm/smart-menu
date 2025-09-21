@@ -4,7 +4,7 @@
 
 PROJECT OVERVIEW:
 -----------------
-Author: Murtuza Hasan )Moon Tech BD)
+Author: Murtuza Hasan (Moon Tech BD)
 Client: Restaurant Owners in Bangladesh
 Project: Luna Dine - Smart QR Menu System for Multi-Branch Restaurants in Bangladesh
 Target: Low-end server deployment with minimal costs
@@ -807,4 +807,5 @@ This admin panel will serve as a competitive advantage for Luna Dine in the Bang
 
 ================================================================================
                                   END OF PLAN
+
 ================================================================================
